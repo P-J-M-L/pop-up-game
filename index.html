@@ -248,10 +248,16 @@
 <body>
     <div class="main-layout">
         <div class="sidebar-ad left">
+            <!-- Side Bars -->
             <ins class="adsbygoogle"
-                 style="display:inline-block;width:160px;height:600px"
+                 style="display:block"
                  data-ad-client="ca-pub-9138726029713580"
-                 data-ad-slot="YOUR_AD_SLOT_ID_LEFT"></ins>
+                 data-ad-slot="4609329816"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
         </div>
         <div class="game-area">
             <div id="effect-bar" style="display:none; position:fixed; top:0; left:0; height:8px; background:#2196F3; z-index:999;"></div>
@@ -280,10 +286,16 @@
             <div id="score-history" style="margin-top:20px; width:100%; max-width:400px;"></div>
         </div>
         <div class="sidebar-ad right">
+            <!-- Side Bars -->
             <ins class="adsbygoogle"
-                 style="display:inline-block;width:160px;height:600px"
-                 data-ad-client="ca-pub-9138726029713580"
-                 data-ad-slot="YOUR_AD_SLOT_ID_RIGHT"></ins>
+                style="display:block"
+                data-ad-client="ca-pub-9138726029713580"
+                data-ad-slot="2528594408"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+        <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
         </div>
     </div>
     <script>
@@ -1193,14 +1205,21 @@
             adContainer.innerHTML = `
                 <h4>Advertisement</h4>
                 <ins class="adsbygoogle"
-                     style="display:inline-block;width:336px;height:280px"
+                     style="display:block"
+                     data-ad-format="autorelaxed"
                      data-ad-client="ca-pub-9138726029713580"
-                     data-ad-slot="YOUR_AD_SLOT_ID_REVIVE"></ins>
+                     data-ad-slot="4292268067"></ins>
                 <div id="skip-timer-revive" style="margin-top:15px; margin-bottom:10px; font-size: 14px; color: #555;">Skip ad in: <span id="countdown-revive">5</span>s</div>
                 <button id="skip-ad-btn-revive" style="display:none; padding: 8px 15px; background-color: #f44336; color:white; border:none; border-radius:4px; cursor:pointer;">Skip Ad</button>
             `;
             overlay.appendChild(adContainer);
             document.body.appendChild(overlay);
+
+            try {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {
+                console.error("AdSense push error for revive ad:", e);
+            }
 
             let timeLeft = 5;
             const countdownElement = document.getElementById('countdown-revive');
