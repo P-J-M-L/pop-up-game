@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch Me If You Can!</title>
+    <!-- AdSense Verification Snippet -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9138726029713580"
+         crossorigin="anonymous"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+        }
+        .main-layout {
+            display: flex;
+            width: 100vw; /* Back to vw */
+            height: 100vh; /* Back to vh */
+            min-height: 100vh; /* Keep min-height relative to viewport */
+            min-width: 100vw; /* Restore min-width */
+            background: #f0f0f0;
+        }
+        .sidebar-ad {
+            width: 200px;
+            min-width: 160px;
+            background: #fff;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.07);
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .sidebar-ad.left {
+            border-right: 1px solid #eee;
+        }
+        .sidebar-ad.right {
+            border-left: 1px solid #eee;
+        }
+        .ad-placeholder {
+            width: 160px;
+            height: 600px;
+            background: #eee;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #888;
+            text-align: center;
+        }
+        .game-area {
+            flex: 1; /* Back to flex: 1 */
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+        .game-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .score-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .score, .target, .lives {
+            font-size: 24px;
+            color: #333;
+            background-color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .lives {
+            color: #e74c3c;
+        }
+        .target {
+            color: #2ecc71;
+        }
+        .progress-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #ddd;
+            border-radius: 4px;
+            margin: 10px auto;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.5s;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+        .popup {
+            position: absolute;
+            width: 300px;
+            background-color: white;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .popup-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #777;
+            padding: 5px;
+            margin: 0;
+            transition: color 0.3s;
+        }
+        .close-btn:hover {
+            outline: 2px solid #f44336;
+            outline-offset: 2px;
+            color: #f44336;
+        }
+        .popup-content {
+            text-align: center;
+        }
+        .game-over {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+        .game-win {
+            color: #2ecc71;
+        }
+        .game-lose {
+            color: #f44336;
+        }
+        .instructions {
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: left;
+            line-height: 1.6;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .bonus-popup {
+            border: 2px solid gold;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+            animation: glow 1.5s infinite alternate;
+        }
+        .trap-popup {
+            border: 2px solid #f44336;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px gold;
+            }
+            to {
+                box-shadow: 0 0 20px gold, 0 0 30px orange;
+            }
+        }
+        .level-indicator {
+            font-size: 20px;
+            margin: 10px 0;
+            color: #333;
+        }
+        @media (max-width: 1300px) {
+            .game-area {
+                max-width: 600px;
+            }
+            .ad-placeholder {
+                height: 400px;
+            }
+        }
+        @media (max-width: 900px) {
+            .game-area {
+                max-width: 350px;
+            }
+            .ad-placeholder {
+                height: 200px;
+            }
+        }
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 0 2vw;
+            }
+            .popup {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .score, .target, .lives {
+                font-size: 18px;
+                padding: 6px 8px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-layout">
+        <div class="sidebar-ad left">
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:160px;height:600px"
+                 data-ad-client="ca-pub-9138726029713580"
+                 data-ad-slot="YOUR_AD_SLOT_ID_LEFT"></ins>
+        </div>
+        <div class="game-area">
+            <div id="effect-bar" style="display:none; position:fixed; top:0; left:0; height:8px; background:#2196F3; z-index:999;"></div>
+            <div class="game-container">
+                <h1>Catch Me If You Can!</h1>
+                <div class="level-indicator">Level: <span id="level">1</span></div>
+                <div class="score-container">
+                    <div class="score">Score: <span id="score">0</span></div>
+                    <div class="target">Target: <span id="target">10</span></div>
+                    <div class="lives">Lives: <span id="lives">3</span></div>
+                </div>
+                <div class="progress-container">
+                    <div id="progress-bar" class="progress-bar">0%</div>
+                </div>
+                <div class="instructions">
+                    <p><strong>How to play:</strong> Close popups by clicking the "×". Each popup lasts 3 seconds—close it or lose a life (except traps, which are safe to ignore).</p>
+                    <p><strong>Scoring:</strong> Earn points by closing popups. Bonus popups give more points. Power-ups are earned by points and are always helpful—unless corrupted!</p>
+                    <p><strong>Power-ups:</strong> Use them wisely! Corrupted power-ups are temporary and disappear after 5 seconds if not used.</p>
+                    <p><strong>Tip:</strong> Higher levels bring new surprises. Survive as long as you can!</p>
+                </div>
+                <button id="start-btn">Start Game</button>
+                <button id="freeze-btn" style="display: none; background-color:#2196F3; visibility:hidden;">Freeze Popups (F)</button>
+                <button id="slowmo-btn" style="display: none; background-color:#9C27B0; visibility:hidden;">Slow Motion (S)</button>
+                <button id="reset-btn" style="display: none;">Play Again</button>
+            </div>
+            <div id="score-history" style="margin-top:20px; width:100%; max-width:400px;"></div>
+        </div>
+        <div class="sidebar-ad right">
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:160px;height:600px"
+                 data-ad-client="ca-pub-9138726029713580"
+                 data-ad-slot="YOUR_AD_SLOT_ID_RIGHT"></ins>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const freezeBtn = document.getElementById('freeze-btn');
+        const slowmoBtn = document.getElementById('slowmo-btn');
+        const scoreElement = document.getElementById('score');
+        const livesElement = document.getElementById('lives');
+        const progressBar = document.getElementById('progress-bar');
+        const targetElement = document.getElementById('target');
+        const levelElement = document.getElementById('level');
+        const effectBar = document.getElementById('effect-bar');
+        const gameArea = document.querySelector('.game-area');
+
+        let score = 0;
+        let lives = 3;
+        let level = 1;
+        let popupsClosed = 0;
+        let activePopups = [];
+        let gameActive = false;
+        let freezeActive = false;
+        let slowmoActive = false;
+        let reverseActive = false;
+        let invisibleActive = false;
+        let doublePointsActive = false;
+        let freezeAvailable = false;
+        let slowmoAvailable = false;
+        let reverseAvailable = false;
+        let invisibleAvailable = false;
+        let doublePointsAvailable = false;
+        let popupSpawnInterval;
+        let popupSpawner;
+        let freezePoints = 0;
+        let slowmoPoints = 0;
+        let freezeCorrupted = false;
+        let slowmoCorrupted = false;
+        let currentPowerup = null;
+        let shield = 0;
+        let legendaryShield = 0;
+        let cleanseActive = false;
+        let mirrorModeActive = false;
+        let ghostModeActive = false;
+        let doubleScoreActive = false;
+        let autoCloseActive = false;
+        let chaosActive = false;
+        let chaosTimeout = null;
+        let cleanseAvailable = false;
+        let cleanseCorrupted = false;
+        let closeAllAvailable = false;
+        let closeAllCorrupted = false;
+        let pauseAvailable = false;
+        let pauseCorrupted = false;
+        let pauseActive = false;
+        let pauseTimeout = null;
+        let reverseCounter = 0;
+        let invisibleCounter = 0;
+        let doublePointsCounter = 0;
+
+        startBtn.addEventListener('click', startGame);
+        resetBtn.addEventListener('click', startGame);
+        freezeBtn.addEventListener('click', () => activatePowerup('freeze'));
+        slowmoBtn.addEventListener('click', () => activatePowerup('slowmo'));
+        document.addEventListener('keydown', function(e) {
+            if (e.key.toLowerCase() === 'f') activatePowerup('freeze');
+            if (e.key.toLowerCase() === 's') activatePowerup('slowmo');
+            if (e.key.toLowerCase() === 'r') activatePowerup('reverse');
+            if (e.key.toLowerCase() === 'i') activatePowerup('invisible');
+            if (e.key.toLowerCase() === 'd') activatePowerup('doublePoints');
+        });
+
+        function startGame() {
+            gameActive = true;
+            score = 0;
+            lives = 3;
+            level = 1;
+            popupsClosed = 0;
+            freezeAvailable = false;
+            slowmoAvailable = false;
+            reverseAvailable = false;
+            invisibleAvailable = false;
+            doublePointsAvailable = false;
+            cleanseAvailable = false;
+            cleanseCorrupted = false;
+            closeAllAvailable = false;
+            closeAllCorrupted = false;
+            freezeActive = false;
+            slowmoActive = false;
+            reverseActive = false;
+            invisibleActive = false;
+            doublePointsActive = false;
+            freezePoints = 0;
+            slowmoPoints = 0;
+            freezeCorrupted = false;
+            slowmoCorrupted = false;
+            currentPowerup = null;
+            shield = 0;
+            legendaryShield = 0;
+            cleanseActive = false;
+            mirrorModeActive = false;
+            ghostModeActive = false;
+            doubleScoreActive = false;
+            autoCloseActive = false;
+            chaosActive = false;
+            if (chaosTimeout) clearTimeout(chaosTimeout);
+            pauseAvailable = false;
+            pauseCorrupted = false;
+            if (pauseTimeout) clearTimeout(pauseTimeout);
+            reverseCounter = 0;
+            invisibleCounter = 0;
+            doublePointsCounter = 0;
+
+            updateGameInfo();
+            startBtn.style.display = 'none';
+            resetBtn.style.display = 'none';
+            freezeBtn.style.display = 'inline-block';
+            slowmoBtn.style.display = 'inline-block';
+            freezeBtn.style.visibility = 'hidden';
+            slowmoBtn.style.visibility = 'hidden';
+            freezeBtn.disabled = false;
+            slowmoBtn.disabled = false;
+            removeExtraPowerupButtons();
+            activePopups.forEach(popup => popup.remove());
+            activePopups = [];
+            clearInterval(popupSpawner);
+            popupSpawnInterval = getPopupIntervalForLevel(level);
+            popupSpawner = setInterval(spawnPopup, popupSpawnInterval);
+            spawnPopup(); // Restore initial spawn
+        }
+
+        function removeExtraPowerupButtons() {
+            const ids = ['reverse-btn', 'invisible-btn', 'doublepoints-btn', 'cleanse-btn', 'closeAll-btn', 'pause-btn'];
+            ids.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.remove();
+            });
+        }
+
+        function getPopupIntervalForLevel(lvl) {
+            return Math.max(500, 2000 - (lvl - 1) * 120);
+        }
+
+        function updateGameInfo() {
+            scoreElement.textContent = score;
+            livesElement.textContent = lives;
+            levelElement.textContent = level;
+            targetElement.textContent = (level * 10);
+            const progress = Math.min(100, Math.floor((popupsClosed % 10) * 10));
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress + '%';
+        }
+
+        function showEffectBar(duration, color) {
+            effectBar.style.background = color;
+            effectBar.style.display = 'block';
+            effectBar.style.width = '100%';
+            effectBar.style.transition = `width ${duration}s linear`;
+            setTimeout(() => effectBar.style.width = '0%', 10);
+            setTimeout(() => {
+                effectBar.style.display = 'none';
+                effectBar.style.transition = '';
+                effectBar.style.width = '100%';
+            }, duration * 1000 + 50);
+        }
+
+        function activatePowerup(type) {
+            if (!gameActive) return;
+            if (type === 'freeze' && freezeAvailable && !freezeActive) {
+                freezeActive = true;
+                freezeBtn.style.visibility = 'hidden';
+                freezeBtn.disabled = true;
+                freezeAvailable = false;
+                currentPowerup = 'freeze';
+                if (freezeCorrupted) {
+                    activePopups.forEach(p => {
+                        p.classList.remove('bonus-popup');
+                        p.classList.add('trap-popup');
+                        p.querySelector('.popup-title').textContent = 'Trap Popup!';
+                        p.querySelector('.popup-content').textContent = 'Don\'t close me!';
+                    });
+                    showEffectBar(2, '#222');
+                    freezeCorrupted = false;
+                    freezeBtn.classList.remove('corrupted');
+                    setTimeout(() => {
+                        freezeActive = false;
+                        freezeBtn.disabled = false;
+                        currentPowerup = null;
+                    }, 2000);
+                    return;
+                }
+                activePopups.forEach(p => {
+                    p.dataset.frozen = 'true';
+                    p.style.pointerEvents = '';
+                    p.style.opacity = '0.6';
+                });
+                showEffectBar(2, '#2196F3');
+                setTimeout(() => {
+                    activePopups.forEach(p => {
+                        p.dataset.frozen = 'false';
+                        p.style.opacity = '';
+                    });
+                    freezeActive = false;
+                    freezeBtn.disabled = false;
+                    currentPowerup = null;
+                }, 2000);
+            }
+            if (type === 'slowmo' && slowmoAvailable && !slowmoActive) {
+                slowmoActive = true;
+                slowmoBtn.style.visibility = 'hidden';
+                slowmoBtn.disabled = true;
+                slowmoAvailable = false;
+                currentPowerup = 'slowmo';
+                if (slowmoCorrupted) {
+                    activePopups.forEach(p => {
+                        if (p.moveInterval) {
+                            clearInterval(p.moveInterval);
+                            p.moveInterval = setInterval(p.moveFunc, Math.max(10, p.baseSpeed * 0.75));
+                        }
+                    });
+                    showEffectBar(5, '#222');
+                    slowmoCorrupted = false;
+                    slowmoBtn.classList.remove('corrupted');
+                    setTimeout(() => {
+                        activePopups.forEach(p => {
+                            if (p.moveInterval) {
+                                clearInterval(p.moveInterval);
+                                p.moveInterval = setInterval(p.moveFunc, p.baseSpeed);
+                            }
+                        });
+                        slowmoActive = false;
+                        slowmoBtn.disabled = false;
+                        currentPowerup = null;
+                    }, 5000);
+                    return;
+                }
+                activePopups.forEach(p => {
+                    if (p.moveInterval) {
+                        clearInterval(p.moveInterval);
+                        p.moveInterval = setInterval(p.moveFunc, p.baseSpeed * 4);
+                    }
+                });
+                showEffectBar(5, '#9C27B0');
+                setTimeout(() => {
+                    activePopups.forEach(p => {
+                        if (p.moveInterval) {
+                            clearInterval(p.moveInterval);
+                            p.moveInterval = setInterval(p.moveFunc, p.baseSpeed);
+                        }
+                    });
+                    slowmoActive = false;
+                    slowmoBtn.disabled = false;
+                    currentPowerup = null;
+                }, 5000);
+            }
+            if (type === 'reverse' && reverseAvailable && !reverseActive) {
+                const btn = document.getElementById('reverse-btn');
+                if (!btn) return;
+                reverseActive = true;
+                btn.style.visibility = 'hidden';
+                btn.disabled = true;
+                reverseAvailable = false;
+                currentPowerup = 'reverse';
+                showEffectBar(4, '#FF9800');
+                setTimeout(() => {
+                    reverseActive = false;
+                    btn.disabled = false;
+                    currentPowerup = null;
+                }, 4000);
+            }
+            if (type === 'invisible' && invisibleAvailable && !invisibleActive) {
+                const btn = document.getElementById('invisible-btn');
+                if (!btn) return;
+                invisibleActive = true;
+                btn.style.visibility = 'hidden';
+                btn.disabled = true;
+                invisibleAvailable = false;
+                currentPowerup = 'invisible';
+                activePopups.forEach(p => {
+                    if (p.closeBtn) p.closeBtn.style.opacity = '0';
+                });
+                showEffectBar(4, '#607D8B');
+                setTimeout(() => {
+                    activePopups.forEach(p => {
+                        if (p.closeBtn) p.closeBtn.style.opacity = '';
+                    });
+                    invisibleActive = false;
+                    btn.disabled = false;
+                    currentPowerup = null;
+                }, 4000);
+            }
+            if (type === 'doublePoints' && doublePointsAvailable && !doublePointsActive) {
+                const btn = document.getElementById('doublepoints-btn');
+                if (!btn) return;
+                doublePointsActive = true;
+                btn.style.visibility = 'hidden';
+                btn.disabled = true;
+                doublePointsAvailable = false;
+                currentPowerup = 'doublePoints';
+                showEffectBar(5, '#FFD600');
+                setTimeout(() => {
+                    doublePointsActive = false;
+                    btn.disabled = false;
+                    currentPowerup = null;
+                }, 5000);
+            }
+            if (type === 'cleanse' && cleanseAvailable) {
+                const btn = document.getElementById('cleanse-btn');
+                if (!btn) return;
+                cleanseAvailable = false;
+                btn.style.visibility = 'hidden';
+                btn.disabled = true;
+                if (cleanseCorrupted) {
+                    activePopups.forEach(p => {
+                        if (!p.classList.contains('trap-popup') && !p.classList.contains('epic-negative-popup') && !p.classList.contains('legendary-negative-popup')) {
+                            p.classList.remove('bonus-popup', 'heart-popup', 'epic-popup', 'legendary-popup');
+                            p.classList.add('trap-popup');
+                            p.querySelector('.popup-title').textContent = 'Trap Popup!';
+                            p.querySelector('.popup-content').textContent = 'Don\'t close me!';
+                        }
+                    });
+                    cleanseCorrupted = false;
+                    btn.classList.remove('corrupted');
+                } else {
+                    activePopups.forEach(p => {
+                        if (p.classList.contains('trap-popup') || p.classList.contains('epic-negative-popup') || p.classList.contains('legendary-negative-popup')) {
+                            p.remove();
+                        }
+                    });
+                    activePopups = activePopups.filter(p => !(p.classList.contains('trap-popup') || p.classList.contains('epic-negative-popup') || p.classList.contains('legendary-negative-popup')));
+                }
+            }
+            if (type === 'closeAll' && closeAllAvailable) {
+                const btn = document.getElementById('closeAll-btn');
+                if (!btn) return;
+                closeAllAvailable = false;
+                btn.style.visibility = 'hidden';
+                btn.disabled = true;
+                if (closeAllCorrupted) {
+                    activePopups.filter(p => !p.classList.contains('trap-popup') && !p.classList.contains('epic-negative-popup') && !p.classList.contains('legendary-negative-popup')).forEach(p => p.remove());
+                    activePopups = activePopups.filter(p => p.classList.contains('trap-popup') || p.classList.contains('epic-negative-popup') || p.classList.contains('legendary-negative-popup'));
+                    closeAllCorrupted = false;
+                    btn.classList.remove('corrupted');
+                } else {
+                    activePopups.filter(p => !p.classList.contains('trap-popup') && !p.classList.contains('epic-negative-popup') && !p.classList.contains('legendary-negative-popup')).forEach(p => {
+                        let points = 1;
+                        if (p.classList.contains('bonus-popup')) points = 3;
+                        if (doubleScoreActive) points *= 2;
+                        score += points;
+                        popupsClosed++;
+                        p.remove();
+                    });
+                    activePopups = activePopups.filter(p => p.classList.contains('trap-popup') || p.classList.contains('epic-negative-popup') || p.classList.contains('legendary-negative-popup'));
+                    updateGameInfo();
+                }
+            }
+            if (type === 'pause' && pauseAvailable && !pauseActive) {
+                const btn = document.getElementById('pause-btn');
+                if (!btn) return;
+                pauseAvailable = false;
+                btn.style.visibility = 'hidden';
+                btn.disabled = true;
+                if (pauseCorrupted) {
+                    for (let i = 0; i < 5; i++) setTimeout(spawnPopup, i * 200);
+                    pauseCorrupted = false;
+                    btn.classList.remove('corrupted');
+                } else {
+                    pauseActive = true;
+                    if (pauseTimeout) clearTimeout(pauseTimeout);
+                    pauseTimeout = setTimeout(() => { pauseActive = false; }, 5000);
+                }
+            }
+        }
+
+        function updatePowerups(popupClosedType, pointsGained) {
+            if (!freezeActive && popupClosedType !== 'freeze') freezePoints += pointsGained;
+            if (!slowmoActive && popupClosedType !== 'slowmo') slowmoPoints += pointsGained;
+            
+            if (freezePoints >= 15 && !freezeAvailable) {
+                freezeAvailable = true;
+                freezeBtn.style.visibility = 'visible';
+                freezePoints = 0;
+                if (freezeCorrupted) freezeBtn.classList.add('corrupted');
+                else freezeBtn.classList.remove('corrupted');
+            }
+            if (slowmoPoints >= 10 && !slowmoAvailable) {
+                slowmoAvailable = true;
+                slowmoBtn.style.visibility = 'visible';
+                slowmoPoints = 0;
+                if (slowmoCorrupted) slowmoBtn.classList.add('corrupted');
+                else slowmoBtn.classList.remove('corrupted');
+            }
+
+            if (level >= 8) reverseCounter += pointsGained;
+            if (level >= 12) invisibleCounter += pointsGained;
+            if (level >= 15) doublePointsCounter += pointsGained;
+
+            if (level >= 8 && reverseCounter >= 10 && !reverseAvailable) {
+                reverseAvailable = true;
+                showExtraPowerupButton('reverse');
+                reverseCounter = 0;
+            }
+            if (level >= 12 && invisibleCounter >= 12 && !invisibleAvailable) {
+                invisibleAvailable = true;
+                showExtraPowerupButton('invisible');
+                invisibleCounter = 0;
+            }
+            if (level >= 15 && doublePointsCounter >= 15 && !doublePointsAvailable) {
+                doublePointsAvailable = true;
+                showExtraPowerupButton('doublePoints');
+                doublePointsCounter = 0;
+            }
+            if (score >= 20 && !cleanseAvailable) {
+                cleanseAvailable = true;
+                showExtraPowerupButton('cleanse');
+                if (cleanseCorrupted) document.getElementById('cleanse-btn').classList.add('corrupted');
+                else document.getElementById('cleanse-btn').classList.remove('corrupted');
+            }
+            if (score >= 40 && !closeAllAvailable) {
+                closeAllAvailable = true;
+                showExtraPowerupButton('closeAll');
+                if (closeAllCorrupted) document.getElementById('closeAll-btn').classList.add('corrupted');
+                else document.getElementById('closeAll-btn').classList.remove('corrupted');
+            }
+            if (score >= 30 && !pauseAvailable) {
+                pauseAvailable = true;
+                showExtraPowerupButton('pause');
+                if (pauseCorrupted) document.getElementById('pause-btn').classList.add('corrupted');
+                else document.getElementById('pause-btn').classList.remove('corrupted');
+            }
+        }
+
+        function showExtraPowerupButton(type) {
+            let btn = document.getElementById(type + '-btn');
+            if (!btn) {
+                btn = document.createElement('button');
+                btn.id = type + '-btn';
+                btn.style.marginLeft = '10px';
+                btn.style.display = 'inline-block';
+                btn.style.backgroundColor = {
+                    'reverse': '#FF9800',
+                    'invisible': '#607D8B',
+                    'doublePoints': '#FFD600',
+                    'cleanse': '#00bcd4',
+                    'closeAll': '#4CAF50',
+                    'pause': '#607D8B'
+                }[type] || '#888';
+                btn.textContent = {
+                    'reverse': 'Reverse Controls (R)',
+                    'invisible': 'Invisible Close (I)',
+                    'doublePoints': 'Double Points (D)',
+                    'cleanse': 'Cleanse Negatives (C)',
+                    'closeAll': 'Close All Positives (A)',
+                    'pause': 'Pause Popups (P)'
+                }[type] || type;
+                btn.onclick = () => activatePowerup(type);
+                document.querySelector('.game-container').appendChild(btn);
+            }
+            btn.style.visibility = 'visible';
+            btn.disabled = false;
+            if (btn.classList.contains('corrupted')) {
+                setTimeout(() => {
+                    if (btn.classList.contains('corrupted')) {
+                        btn.style.visibility = 'hidden';
+                        btn.disabled = true;
+                        if (type === 'freeze') freezeCorrupted = false;
+                        if (type === 'slowmo') slowmoCorrupted = false;
+                    }
+                }, 5000);
+            }
+        }
+
+        function spawnPopup() {
+            if (!gameActive || pauseActive) return;
+            const popupType = getPopupTypeForLevel(level);
+            createPopup(popupType);
+        }
+
+        function getPopupTypeForLevel(lvl) {
+            let roll = Math.random();
+            if (chaosActive) {
+                if (roll < 0.01) return 'legendaryTrap';
+                if (roll < 0.06) return roll < 0.035 ? 'epicTrap' : 'epicCorruptor';
+                return 'trap';
+            }
+            if (roll < 0.01) {
+                let legendaryTypes = ['legendaryHeart', 'legendaryPoints', 'legendaryAllPowerups', 'legendaryTimeFreeze', 'legendaryShield', 'legendaryTrap', 'legendaryChaos', 'legendaryCloseAll'];
+                return legendaryTypes[Math.floor(Math.random() * legendaryTypes.length)];
+            }
+            if (roll < 0.06) {
+                let epicTypes = ['epicHeart', 'epicPoints', 'epicCleanse', 'epicShield', 'epicTrap', 'epicCorruptor', 'epicMirror', 'epicGhost'];
+                return epicTypes[Math.floor(Math.random() * epicTypes.length)];
+            }
+            let types = ['normal'];
+            if (lvl >= 2) types.push('bonus');
+            if (lvl >= 3) types.push('trap');
+            if (lvl >= 4) types.push('moving-close');
+            if (lvl >= 5) types.push('fake-close');
+            if (lvl >= 6) types.push('shaky');
+            if (lvl >= 7) types.push('shrinking');
+            if (lvl >= 10) types.push('corrupting');
+            if (lvl >= 12) types.push('invisible');
+            if (lvl >= 15) types.push('doublePoints');
+            
+            if (Math.random() < 0.05) {
+                types.push('heart');
+            }
+            
+            return types[Math.floor(Math.random() * types.length)];
+        }
+
+        function createPopup(type = 'normal') {
+            if (!gameActive) return;
+
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+
+            if (type === 'bonus') popup.classList.add('bonus-popup');
+            else if (type === 'trap') popup.classList.add('trap-popup');
+            else if (type === 'shaky') popup.style.animation = 'shake 0.1s infinite alternate';
+            else if (type === 'shrinking') {
+                popup.style.transition = 'transform 2.5s linear';
+            }
+            if (level >= 10 && Math.random() < 0.1 && type !=='trap') type = 'corrupting';
+            if (type === 'corrupting') {
+                popup.classList.add('trap-popup');
+                popup.style.boxShadow = '0 0 20px 5px #222, 0 0 40px 10px #000 inset';
+            }
+
+            const header = document.createElement('div');
+            header.className = 'popup-header';
+            const title = document.createElement('span');
+            title.className = 'popup-title';
+            title.textContent = getPopupTitle(type);
+            let closeBtn = document.createElement('button');
+            closeBtn.className = 'close-btn';
+            closeBtn.innerHTML = '&times;';
+            popup.closeBtn = closeBtn;
+
+            if (type === 'moving-close' || (reverseActive && type !== 'trap')) {
+                closeBtn.style.position = 'relative';
+            }
+            header.appendChild(title);
+            header.appendChild(closeBtn);
+
+            if (type === 'fake-close') {
+                let fakeBtn = document.createElement('button');
+                fakeBtn.className = 'close-btn';
+                fakeBtn.innerHTML = '&times;';
+                fakeBtn.style.color = '#f44336';
+                fakeBtn.style.marginLeft = '10px';
+                header.appendChild(fakeBtn);
+                fakeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    lives--;
+                    updateGameInfo();
+                    checkGameOver();
+                    removePopup(popup, false);
+                });
+            }
+            popup.appendChild(header);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'popup-content';
+            contentDiv.textContent = getPopupContent(type);
+            popup.appendChild(contentDiv);
+
+            gameArea.appendChild(popup);
+            const popupWidth = popup.offsetWidth;
+            const popupHeight = popup.offsetHeight;
+            activePopups.push(popup);
+
+            if (type === 'shrinking') {
+                setTimeout(() => { popup.style.transform = 'scale(0.3)'; }, 500);
+            }
+            
+            if (type === 'moving-close' || (reverseActive && type !== 'trap')) {
+                 popup.moveCloseInterval = setInterval(() => {
+                    const headerRect = header.getBoundingClientRect();
+                    const btnRect = closeBtn.getBoundingClientRect();
+                    closeBtn.style.left = Math.random() * (headerRect.width - btnRect.width) + 'px';
+                    closeBtn.style.top = Math.random() * (headerRect.height - btnRect.height) + 'px';
+                 }, 300);
+            }
+
+            let currentMaxLeft = gameArea.clientWidth - popupWidth;
+            let currentMaxTop = gameArea.clientHeight - popupHeight;
+            popup.style.position = 'absolute';
+            popup.style.left = Math.max(0, Math.min(Math.random() * currentMaxLeft, currentMaxLeft)) + 'px';
+            popup.style.top = Math.max(0, Math.min(Math.random() * currentMaxTop, currentMaxTop)) + 'px';
+
+            let baseSpeed = type === 'bonus' ? 30 : slowmoActive ? 80 : 25;
+            popup.baseSpeed = baseSpeed;
+            let dx = (Math.random() > 0.5 ? 1 : -1) * (1 + Math.random() * 2);
+            let dy = (Math.random() > 0.5 ? 1 : -1) * (1 + Math.random() * 2);
+
+            function movePopup() {
+                if (!gameActive || (freezeActive && popup.dataset.frozen === 'true')) return;
+
+                const currentPopupWidth = popup.offsetWidth;
+                const currentPopupHeight = popup.offsetHeight;
+                
+                let liveMaxLeft = gameArea.clientWidth - currentPopupWidth;
+                let liveMaxTop = gameArea.clientHeight - currentPopupHeight;
+
+                let left = parseFloat(popup.style.left);
+                let top = parseFloat(popup.style.top);
+
+                left += dx;
+                top += dy;
+
+                if (left <= 0) {
+                    left = 0;
+                    dx = -dx;
+                } else if (left >= liveMaxLeft) {
+                    left = liveMaxLeft;
+                    dx = -dx;
+                }
+
+                if (top <= 0) {
+                    top = 0;
+                    dy = -dy;
+                } else if (top >= liveMaxTop) {
+                    top = liveMaxTop;
+                    dy = -dy;
+                }
+
+                popup.style.left = left + 'px';
+                popup.style.top = top + 'px';
+            }
+            popup.moveFunc = movePopup;
+            popup.moveInterval = setInterval(movePopup, baseSpeed);
+
+            const autoCloseDuration = (type === 'legendaryTimeFreeze') ? 8000 : 3000;
+            const autoCloseTimeout = setTimeout(() => {
+                if (['trap','epicTrap','epicCorruptor','legendaryTrap','legendaryChaos'].includes(type) || type === 'corrupting') {
+                    removePopup(popup, false);
+                } else {
+                    removePopup(popup, true);
+                }
+            }, autoCloseDuration);
+
+            closeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                clearTimeout(autoCloseTimeout);
+                let points = (type === 'bonus' || type === 'normal') ? 1 : 0;
+                
+                if (type === 'trap' || type === 'corrupting' || type === 'epicTrap' || type === 'legendaryTrap') {
+                    lives -= (type === 'epicTrap' ? 3 : (type === 'legendaryTrap' ? lives : 1));
+                    updateGameInfo();
+                    checkGameOver();
+                } else if (type === 'epicCorruptor') {
+                    freezeCorrupted = true; slowmoCorrupted = true;
+                    if(freezeBtn) freezeBtn.classList.add('corrupted');
+                    if(slowmoBtn) slowmoBtn.classList.add('corrupted');
+                } else if (type === 'legendaryChaos') {
+                    chaosActive = true;
+                    chaosTimeout = setTimeout(() => { chaosActive = false; }, 10000);
+                } else if (type === 'heart') {
+                    lives++; updateGameInfo(); points = 1;
+                } else if (type === 'epicHeart') {
+                    lives += 3; updateGameInfo(); points = 3;
+                } else if (type === 'legendaryHeart') {
+                    lives += 7; updateGameInfo(); points = 7;
+                } else if (type === 'epicPoints') {
+                    points = 10;
+                } else if (type === 'legendaryPoints') {
+                    points = 25;
+                } else if (type === 'epicCleanse') {
+                    activePopups.filter(p => p.classList.contains('trap-popup') || p.classList.contains('epic-negative-popup') || p.classList.contains('legendary-negative-popup')).forEach(p_neg => removePopup(p_neg, false));
+                } else if (type === 'epicShield') {
+                    shield = 1;
+                } else if (type === 'legendaryShield') {
+                    legendaryShield = 3;
+                } else if (type === 'legendaryAllPowerups') {
+                    freezeAvailable = true; if(freezeBtn) {freezeBtn.style.visibility = 'visible'; freezeBtn.classList.remove('corrupted');}
+                    slowmoAvailable = true; if(slowmoBtn) {slowmoBtn.style.visibility = 'visible'; slowmoBtn.classList.remove('corrupted');}
+                } else if (type === 'legendaryTimeFreeze') {
+                    activePopups.forEach(p => { p.dataset.frozen = 'true'; p.style.opacity = '0.6'; });
+                    setTimeout(() => { activePopups.forEach(p => { p.dataset.frozen = 'false'; p.style.opacity = ''; }); }, 5000);
+                } else if (type === 'epicMirror') {
+                    mirrorModeActive = true; setTimeout(() => { mirrorModeActive = false; }, 10000);
+                } else if (type === 'epicGhost') {
+                    ghostModeActive = true; setTimeout(() => { ghostModeActive = false; }, 10000);
+                } else if (type === 'doubleScore') {
+                    doubleScoreActive = true; setTimeout(() => { doubleScoreActive = false; }, 10000);
+                } else if (type === 'autoClose') {
+                    autoCloseActive = true; setTimeout(() => { autoCloseActive = false; }, 5000);
+                } else if (type === 'legendaryCloseAll') {
+                    activePopups.filter(p => !p.classList.contains('trap-popup') && !p.classList.contains('epic-negative-popup') && !p.classList.contains('legendary-negative-popup')).forEach(p_pos => {
+                        let pts = p_pos.classList.contains('bonus-popup') ? 3 : 1;
+                        if (doublePointsActive || doubleScoreActive) pts *= 2;
+                        score += pts;
+                        popupsClosed++;
+                        removePopup(p_pos, false);
+                    });
+                    updateGameInfo();
+                } else {
+                    if (type === 'bonus') points = 3;
+                }
+
+                if (points > 0) {
+                    if (doublePointsActive || doubleScoreActive) points *= 2;
+                    score += points;
+                    popupsClosed++;
+                    updateGameInfo();
+                    updatePowerups(currentPowerup, points);
+                    checkLevelUp();
+                }
+                removePopup(popup, false);
+            });
+
+            popup.addEventListener('click', function(e) {
+                if (e.target !== closeBtn && !closeBtn.contains(e.target) && (type !== 'trap' && type !== 'corrupting' && type !== 'epicTrap' && type !== 'legendaryTrap')) {
+                    if (shield > 0) {
+                        shield--;
+                    } else if (legendaryShield > 0) {
+                        legendaryShield--;
+                    } else {
+                        lives--;
+                    }
+                    updateGameInfo();
+                    checkGameOver();
+                    removePopup(popup, false);
+                }
+            });
+            popup.autoCloseTimeout = autoCloseTimeout; 
+        }
+        
+        function removePopup(popupToRemove, autoLostLife) {
+            if (!popupToRemove) return;
+            clearTimeout(popupToRemove.autoCloseTimeout);
+            if (popupToRemove.moveInterval) clearInterval(popupToRemove.moveInterval);
+            if (popupToRemove.moveCloseInterval) clearInterval(popupToRemove.moveCloseInterval);
+            popupToRemove.remove();
+            activePopups = activePopups.filter(p => p !== popupToRemove);
+
+            if (autoLostLife) {
+                 if (shield > 0) {
+                    shield--;
+                } else if (legendaryShield > 0) {
+                    legendaryShield--;
+                } else {
+                    lives--;
+                }
+                updateGameInfo();
+                checkGameOver();
+            }
+        }
+
+        function getPopupTitle(type) {
+            switch(type) {
+                case 'bonus': return 'Bonus Popup!';
+                case 'trap': return 'Trap Popup!';
+                case 'moving-close': return 'Catch the Close!';
+                case 'fake-close': return 'Which is Real?';
+                case 'shaky': return 'Shaky Popup!';
+                case 'shrinking': return 'Shrinking Popup!';
+                case 'reverse': return 'Reverse Controls Powerup!';
+                case 'invisible': return 'Invisible Close Powerup!';
+                case 'doublePoints': return 'Double Points Powerup!';
+                case 'corrupting': return 'Corrupting Popup!';
+                case 'heart': return 'Heart Popup!';
+                case 'epicHeart': return 'Epic Heart!';
+                case 'epicPoints': return 'Epic Points!';
+                case 'epicCleanse': return 'Epic Cleanse!';
+                case 'epicShield': return 'Epic Shield!';
+                case 'epicTrap': return 'Epic Trap!';
+                case 'epicCorruptor': return 'Epic Corruptor!';
+                case 'legendaryHeart': return 'Legendary Heart!';
+                case 'legendaryPoints': return 'Legendary Points!';
+                case 'legendaryAllPowerups': return 'Legendary Power Surge!';
+                case 'legendaryTimeFreeze': return 'Legendary Time Freeze!';
+                case 'legendaryShield': return 'Legendary Shield!';
+                case 'legendaryTrap': return 'Legendary Trap!';
+                case 'legendaryChaos': return 'Legendary Chaos!';
+                case 'epicMirror': return 'Epic Mirror!';
+                case 'epicGhost': return 'Epic Ghost!';
+                case 'legendaryCloseAll': return 'Legendary Close All!';
+                case 'autoClose': return 'Auto Close Active!';
+                default: return 'Popup';
+            }
+        }
+
+        function getPopupContent(type) {
+            switch(type) {
+                case 'bonus': return 'Click the close button for bonus points!';
+                case 'trap': return 'Don\'t close me!';
+                case 'moving-close': return 'The close button moves!';
+                case 'fake-close': return 'One close button is fake!';
+                case 'shaky': return 'This popup shakes!';
+                case 'shrinking': return 'This popup is shrinking!';
+                case 'reverse': return 'Controls are reversed (Powerup)!';
+                case 'invisible': return 'Close button is invisible (Powerup)!';
+                case 'doublePoints': return 'All popups give double points (Powerup)!';
+                case 'corrupting': return 'Close me to corrupt a power-up!';
+                case 'heart': return 'Close me for +1 life!';
+                case 'epicHeart': return 'Close me for +3 lives!';
+                case 'epicPoints': return 'Close me for +10 points!';
+                case 'epicCleanse': return 'Remove all negative popups!';
+                case 'epicShield': return 'One-time shield!';
+                case 'epicTrap': return 'Lose 3 lives if closed!';
+                case 'epicCorruptor': return 'Corrupts all power-ups!';
+                case 'legendaryHeart': return 'Close me for +7 lives!';
+                case 'legendaryPoints': return 'Close me for +25 points!';
+                case 'legendaryAllPowerups': return 'All power-ups granted!';
+                case 'legendaryTimeFreeze': return 'All popups frozen & beneficial for 5s!';
+                case 'legendaryShield': return 'Shield for 3 hits!';
+                case 'legendaryTrap': return 'Instantly ends the game if closed!';
+                case 'legendaryChaos': return 'All popups negative for 10s!';
+                case 'epicMirror': return 'All popups mirrored for 10s!';
+                case 'epicGhost': return 'Some popups are ghostly for 10s!';
+                case 'legendaryCloseAll': return 'Closes all positive popups and grants rewards!';
+                case 'autoClose': return 'Popups auto-close beneficially!';
+                default: return 'Close me!';
+            }
+        }
+
+        function checkLevelUp() {
+            if (popupsClosed > 0 && popupsClosed % 10 === 0) {
+                level++;
+                updateGameInfo();
+                clearInterval(popupSpawner);
+                popupSpawnInterval = getPopupIntervalForLevel(level);
+                popupSpawner = setInterval(spawnPopup, popupSpawnInterval);
+            }
+        }
+
+        function checkGameOver() {
+            if (lives <= 0) {
+                endGame('Game Over!');
+            }
+        }
+
+        function endGame(message) {
+            gameActive = false;
+            clearInterval(popupSpawner);
+            activePopups.forEach(p => removePopup(p, false));
+            activePopups = [];
+            removeExtraPowerupButtons();
+            saveScore(score);
+            showScoreHistory();
+
+            const gameOverPopup = document.createElement('div');
+            gameOverPopup.className = 'popup game-over-popup';
+            gameOverPopup.style.zIndex = "9999";
+            gameOverPopup.style.position = 'fixed';
+            gameOverPopup.style.left = '50%';
+            gameOverPopup.style.top = '50%';
+            gameOverPopup.style.transform = 'translate(-50%, -50%)';
+
+            const header = document.createElement('div');
+            header.className = 'popup-header';
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'popup-title';
+            titleSpan.textContent = 'Game Over';
+            header.appendChild(titleSpan);
+            gameOverPopup.appendChild(header);
+
+            const content = document.createElement('div');
+            content.className = 'popup-content';
+            content.innerHTML = `
+                <div class='game-over game-lose'>${message}</div>
+                <p style="font-size: 18px; margin: 10px 0;">Your Score: ${score}</p>
+                <div id="revive-container" style="margin-top: 20px;">
+                    <button id="revive-btn-main" style="background-color: #4CAF50; margin: 5px;">Revive (Watch Ad)</button>
+                    <button id="play-again-after-gameover" style="background-color: #2196F3; margin: 5px;">Play Again</button>
+                </div>
+            `;
+            gameOverPopup.appendChild(content);
+            document.body.appendChild(gameOverPopup);
+
+            document.getElementById('revive-btn-main').onclick = function() {
+                gameOverPopup.remove();
+                showSkippableAdForRevive();
+            };
+
+            document.getElementById('play-again-after-gameover').onclick = function() {
+                gameOverPopup.remove();
+                startGame();
+            };
+
+            freezeBtn.style.display = 'none';
+            slowmoBtn.style.display = 'none';
+            resetBtn.style.display = 'none';
+        }
+
+        function showSkippableAdForRevive() {
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100vw';
+            overlay.style.height = '100vh';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+            overlay.style.zIndex = "10000";
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+
+            const adContainer = document.createElement('div');
+            adContainer.style.background = 'white';
+            adContainer.style.padding = '20px';
+            adContainer.style.borderRadius = '8px';
+            adContainer.style.textAlign = 'center';
+            adContainer.style.minWidth = '336px';
+            adContainer.innerHTML = `
+                <h4>Advertisement</h4>
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:336px;height:280px"
+                     data-ad-client="ca-pub-9138726029713580"
+                     data-ad-slot="YOUR_AD_SLOT_ID_REVIVE"></ins>
+                <div id="skip-timer-revive" style="margin-top:15px; margin-bottom:10px; font-size: 14px; color: #555;">Skip ad in: <span id="countdown-revive">5</span>s</div>
+                <button id="skip-ad-btn-revive" style="display:none; padding: 8px 15px; background-color: #f44336; color:white; border:none; border-radius:4px; cursor:pointer;">Skip Ad</button>
+            `;
+            overlay.appendChild(adContainer);
+            document.body.appendChild(overlay);
+
+            let timeLeft = 5;
+            const countdownElement = document.getElementById('countdown-revive');
+            const skipBtn = document.getElementById('skip-ad-btn-revive');
+            const adTimerInterval = setInterval(() => {
+                timeLeft--;
+                if(countdownElement) countdownElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(adTimerInterval);
+                    if(countdownElement && countdownElement.parentElement) countdownElement.parentElement.textContent = "You can skip now.";
+                    if(skipBtn) skipBtn.style.display = 'inline-block';
+                }
+            }, 1000);
+
+            if(skipBtn) {
+                skipBtn.onclick = function() {
+                    clearInterval(adTimerInterval);
+                    overlay.remove();
+                    resetBtn.style.display = 'inline-block';
+                };
+            }
+            
+            const adCompleteTimeout = setTimeout(() => {
+                if (document.body.contains(overlay)) {
+                    clearInterval(adTimerInterval);
+                    overlay.remove();
+                    lives = 3;
+                    updateGameInfo();
+                    gameActive = true;
+                    popupSpawnInterval = getPopupIntervalForLevel(level);
+                    popupSpawner = setInterval(spawnPopup, popupSpawnInterval);
+                }
+            }, 5100);
+        }
+
+        function saveScore(newScore) {
+            let scores = JSON.parse(localStorage.getItem('historicalScores') || '[]');
+            scores.push({ score: newScore, date: new Date().toISOString() });
+            scores = scores.sort((a, b) => b.score - a.score).slice(0, 10);
+            localStorage.setItem('historicalScores', JSON.stringify(scores));
+        }
+
+        function showScoreHistory() {
+            let scores = JSON.parse(localStorage.getItem('historicalScores') || '[]');
+            let html = '<h3>Your Top Scores</h3>';
+            if (scores.length === 0) {
+                html += '<p>No games played yet.</p>';
+            } else {
+                html += '<ol style="max-height:150px;overflow:auto;text-align:left; padding-left: 20px;">';
+                scores.forEach((s) => {
+                    html += `<li><b>${s.score}</b> <span style="color:#888;font-size:12px;">(${new Date(s.date).toLocaleString()})</span></li>`;
+                });
+                html += '</ol>';
+            }
+            const scoreHistoryDiv = document.getElementById('score-history');
+            if(scoreHistoryDiv) scoreHistoryDiv.innerHTML = html;
+        }
+        
+        showScoreHistory();
+
+        const dynamicStyle = document.createElement('style');
+        dynamicStyle.innerHTML = `
+            @keyframes shake { 0% { transform: translate(0, 0); } 100% { transform: translate(5px, -5px); } }
+            .corrupted { box-shadow: 0 0 10px 2px #222, 0 0 20px 4px #000 inset !important; background: #222 !important; color: #FFD600 !important; border: 2px solid #FFD600 !important; animation: corrupted-glow 1s infinite alternate; }
+            @keyframes corrupted-glow { from { box-shadow: 0 0 10px #FFD600; } to { box-shadow: 0 0 30px #FFD600, 0 0 40px #222 inset; } }
+            .heart-popup { border: 2px solid #4CAF50; box-shadow: 0 0 10px #4CAF50; }
+            .epic-popup { border: 2px solid #00bcd4; box-shadow: 0 0 20px #00bcd4, 0 0 40px #2196F3 inset; animation: glow-epic 1.5s infinite alternate; }
+            .epic-negative-popup { border: 2px solid #f44336; box-shadow: 0 0 20px #f44336, 0 0 40px #B71C1C inset; animation: glow-epic-neg 1.5s infinite alternate; }
+            .legendary-popup { border: 2px solid gold; box-shadow: 0 0 30px gold, 0 0 60px #FFD600 inset; animation: glow-legendary 1.5s infinite alternate; }
+            .legendary-negative-popup { border: 2px solid #f44336; box-shadow: 0 0 30px #f44336, 0 0 60px #B71C1C inset; animation: glow-legendary-neg 1.5s infinite alternate; }
+            @keyframes glow-epic { from { box-shadow: 0 0 10px #00bcd4; } to { box-shadow: 0 0 30px #00bcd4, 0 0 40px #2196F3 inset; } }
+            @keyframes glow-epic-neg { from { box-shadow: 0 0 10px #f44336; } to { box-shadow: 0 0 30px #f44336, 0 0 40px #B71C1C inset; } }
+            @keyframes glow-legendary { from { box-shadow: 0 0 20px gold; } to { box-shadow: 0 0 60px gold, 0 0 80px #FFD600 inset; } }
+            @keyframes glow-legendary-neg { from { box-shadow: 0 0 20px #f44336; } to { box-shadow: 0 0 60px #f44336, 0 0 80px #B71C1C inset; } }
+            .cleanse-popup { border: 2px solid #00bcd4; box-shadow: 0 0 20px #00bcd4; }
+            .closeall-popup { border: 2px solid #4CAF50; box-shadow: 0 0 20px #4CAF50; }
+        `;
+        document.head.appendChild(dynamicStyle);
+    });
+    </script>
+</body>
+</html>
